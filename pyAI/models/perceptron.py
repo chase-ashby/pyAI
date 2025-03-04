@@ -75,7 +75,7 @@ class Perceptron:
         error = actual - prediction
         total_error += abs(error)
         for i in range(self.num_inputs):
-             self.weights[i] += 0.2 * (error * inputs[i])
+             self.weights[i] += 0.9 * (error * inputs[i])
 
         if (lines != None):
           # Generate line information
@@ -124,9 +124,13 @@ class Perceptron:
     line, = ax.plot([], [], lw=2)
 
     # Scatter plot for training data
-    ax.scatter(x_plus, y_plus, marker = '+', c = 'green', s = 128, linewidth = 2)
-    ax.scatter(x_minus, y_minus, marker = '_', c = 'red', s = 128, linewidth = 2)
+    ax.scatter(x_plus, y_plus, marker = '+', c = 'green', s = 128, linewidth = 1)
+    ax.scatter(x_minus, y_minus, marker = '_', c = 'red', s = 128, linewidth = 1)
 
+    # Total number of iterations
+    nIters = len(lines)-1
+
+    # Create animation
     def animate(i):
         
         # Update the x and y data
@@ -134,7 +138,7 @@ class Perceptron:
         line.set_ydata(lines[i][1])
 
         # Update the title to track iterations
-        ax.set_title(f'Iteration: {i}')
+        ax.set_title(f'Iteration: {i} of {nIters}')
 
         return line,
 

@@ -6,7 +6,7 @@ import training
 #================================
 # Generate Training Set
 #================================
-training_set = training.generate_training_set(1000)
+training_set = training.generate_training_set(30)
 
 #================================
 # Build SLP
