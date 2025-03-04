@@ -75,14 +75,17 @@ class Perceptron:
         error = actual - prediction
         total_error += abs(error)
         for i in range(self.num_inputs):
-             self.weights[i] += 0.9 * (error * inputs[i])
+             self.weights[i] += 0.1 * (error * inputs[i])
 
         if (lines != None):
           # Generate line information
 
-          # Slop and intercept
-          slope = -self.weights[0]/self.weights[1]
-          intercept = -self.weights[2]/self.weights[1]
+          # Slope and intercept
+          w1 = self.weights[1]
+          if (abs(self.weights[1]) < 1e-16): w1 = 1e-16
+ 
+          slope = -self.weights[0]/w1
+          intercept = -self.weights[2]/w1
 
           # Starting and endpoints of the line
           y1 = (slope * xmin) + intercept
@@ -147,5 +150,5 @@ class Perceptron:
         return line,
 
     # Animation function
-    a = animation.FuncAnimation(fig, animate, frames=len(lines), init_func=init, interval=1, blit=False, repeat=False)
+    a = animation.FuncAnimation(fig, animate, frames=len(lines), init_func=init, interval=0.001, blit=False, repeat=False)
     plt.show()

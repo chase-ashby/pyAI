@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import random
 
-def generate_training_set(num_points):
+def generate_training_data(num_points):
     ''' 
     Generate simple training data for SLP 
     '''
