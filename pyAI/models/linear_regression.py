@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 gradient_descent = 0
 normal_equations = 1
 
+
 class LinearRegression:
     """
     A class for performing serial linear regression using gradient descent.
@@ -40,7 +41,7 @@ class LinearRegression:
               - 'ne' = normal equations
               """
             raise ValueError(err_msg)
-        
+
         # Weights including bias
         self.theta = None
 
@@ -59,7 +60,7 @@ class LinearRegression:
         m = X.shape[0]
 
         return np.hstack((X, np.ones((m, 1))))
-    
+
     def _gradientMSE(self, X, y):
         """
         Compute gradient of the mean squared error (MSE)
@@ -77,7 +78,7 @@ class LinearRegression:
         grad_mse = fact * (X.T @ X @ self.theta - X.T @ y)
 
         return grad_mse
-    
+
     def _mse(self, Xb, y):
         """
         Compute the mean squared error (MSE) between predicted outputs
@@ -98,8 +99,8 @@ class LinearRegression:
         m = Xb.shape[0]
         fact = 1.0/float(m)
 
-        return fact * (np.linalg.norm(predicted_output - y)**2) 
-    
+        return fact * (np.linalg.norm(predicted_output - y)**2)
+
     def _fit_gradient_descent(self, Xb, y):
         """
         Generate a linear regression model through gradient descent training.
@@ -110,12 +111,12 @@ class LinearRegression:
         """
 
         # Initialize weights to unity
-        self.theta = np.ones((Xb.shape[1],1))
+        self.theta = np.ones((Xb.shape[1], 1))
 
         # Initial cost
         self.cost_history.append(self._mse(Xb, y))
 
-        # Perform gradient descent for a fixed number of 
+        # Perform gradient descent for a fixed number of
         # iterations or until convergence with a fixed
         # learning rate (will be replaced by backtracking line search)
         for iter in range(self.iterations):
@@ -133,7 +134,8 @@ class LinearRegression:
             self.cost_history.append(cost)
 
             # Check for convergence
-            if (cost < self.tolerance): break
+            if (cost < self.tolerance):
+                break
 
         return None
 
@@ -145,17 +147,17 @@ class LinearRegression:
             Xb: numpy array, the input bias examples and features (m x n+1).
             y: numpy array, the target values (m x 1).
         """
-        
+
         # Initial weights
         self.theta = np.ones((Xb.shape[1], 1))
-        
+
         try:
             self.theta = np.linalg.solve(Xb.T @ Xb, Xb.T @ y)
         except np.linalg.LinAlgError:
             print("The normal equations may not have a unique solution.")
 
         return None
-    
+
     def fit(self, X, y):
         """
         Generate a linear regression model using either gradient descent 
@@ -170,14 +172,14 @@ class LinearRegression:
         # Call solver method
         match self.method:
             case 0:
-                print ("Performing fitting using gradient descent")
+                print("Performing fitting using gradient descent")
                 self._fit_gradient_descent(Xb, y)
-            case 1: 
-                print ("Performing fitting using normal equations")
+            case 1:
+                print("Performing fitting using normal equations")
                 self._fit_normal_equations(Xb, y)
             case _:
                 raise ValueError("Invalid linear regression solver method.")
-            
+
         return None
 
     def predict(self, X):
@@ -195,49 +197,74 @@ class LinearRegression:
         Xb = self._add_bias(X)
 
         return Xb @ self.theta
-    
-    def plot_model(self, X, y):
+
+    def plot_model(self, X, y, fit_type='linear'):
         """
         Visualize the linear regression model.
 
         Parameters:
             X: numpy array, the examples and features (m x n)
             y: numpy array, the target values (m x 1)
+            fit_type: string, type of data fit 
         """
 
-        # Number of features 
+        # Number of features
         n = X.shape[1]
 
-        if n == 1:
-            print('here in plot n == 1')
-            plt.scatter(X, y)
-            plt.plot(X, self.predict(X), color='red')
-            plt.xlabel('Feature')
-            plt.ylabel('Target')
-            plt.title('Linear Regression Fit')
-        elif n == 2:
-            xmin, xmax = X[:, 0].min()-0.1, X[:, 0].max()+0.1
-            ymin, ymax = X[:, 1].min()-0.1, X[:, 1].max()+0.1
-            xg, yg = np.meshgrid(np.arange(xmin, xmax, 0.01),
-                                 np.arange(ymin, ymax, 0.01))
-            Z = self.predict(np.c_[xg.ravel(), yg.ravel()]).reshape(xg.shape)
-            plt.contourf(xg, yg, Z, levels=40, alpha=1.0)
-            plt.scatter(X[:, 0], X[:, 1], c=y.flatten(), edgecolors='k')
-            plt.xlabel('Feature 1')
-            plt.ylabel('Feature 2')
-            plt.title('Linear Regression Contour')
+        if fit_type == 'linear':
+            if n == 1:
+                plt.scatter(X, y)
+                plt.plot(X, self.predict(X), color='red')
+                plt.xlabel('Feature')
+                plt.ylabel('Target')
+                plt.title('Linear Regression Fit')
+            elif n == 2:
+                xmin, xmax = X[:, 0].min()-0.1, X[:, 0].max()+0.1
+                ymin, ymax = X[:, 1].min()-0.1, X[:, 1].max()+0.1
+                xg, yg = np.meshgrid(np.arange(xmin, xmax, 0.01),
+                                     np.arange(ymin, ymax, 0.01))
+                Z = self.predict(
+                    np.c_[xg.ravel(), yg.ravel()]).reshape(xg.shape)
+                plt.contourf(xg, yg, Z, levels=40, alpha=1.0)
+                plt.scatter(X[:, 0], X[:, 1], c=y.flatten(), edgecolors='k')
+                plt.xlabel('Feature 1')
+                plt.ylabel('Feature 2')
+                plt.title('Linear Regression Contour')
+            else:
+                raise Exception(
+                    "Cannot plot fit_type 'linear' models with 0 or more than 2 features.")
+        elif fit_type == 'poly':
+
+            print('here in polynomial fit')
+            plt.scatter(X[:, 0], y)
+            # plt.scatter(X[:, 0], self.predict(X), color='red')
+
+            # y predictions
+            yp = self.predict(X)
+
+            # Sort data
+            indices = np.argsort(X[:, 0])
+            xp = X[indices, 0]
+            yp = yp[indices]
+
+            plt.plot(xp, yp, color='red', linewidth=3)
+            plt.xlabel('x')
+            plt.ylabel('f(x)')
+            plt.title('Polynomial Regression Fit')
+
         else:
-            raise Exception("Cannot plot models with 0 or more than 2 features.")
+            raise Exception(
+                "Cannot plot models with 0 or more than 2 features.")
+
         plt.show()
 
     def plot_cost_history(self):
         plt.title('Cost History')
         plt.xlabel('Iteration')
         plt.ylabel('MSE')
-        
+
         nIter = len(self.cost_history)
-        iters = np.linspace(1,nIter,nIter)
+        iters = np.linspace(1, nIter, nIter)
         print(self.cost_history)
-        plt.semilogy(iters,self.cost_history,'b')
+        plt.semilogy(iters, self.cost_history, 'b')
         plt.show()
-        
